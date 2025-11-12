@@ -17,7 +17,6 @@
 (require 'project)
 (require 'cl-lib)
 (require 'popup)
-(require 'projectile)
 
 ;;;; Customization options
 (defgroup gemini-cli nil
@@ -413,11 +412,13 @@ for each directory across multiple invocations.")
 
 ;;;; add files to context
 (defun gemini-cli-add-context ()
-  "Add FILE to Gemini context."
-        (interactive)
-        (let ((file (projectile-completing-read "Add file to Gemini: "
-                                               (projectile-project-files (projectile-acquire-root)))))
-        (gemini-cli--do-send-command (concat "@" file))))
+  "Add FILE from the current project to Gemini context."
+  (interactive)
+  (let* ((project (project-current t))
+         (root (project-root project))
+         (files (project-files project))
+         (file (completing-read "Add file to Gemini: " files)))
+    (gemini-cli--do-send-command (concat "@" file))))
 
 (defun gemini-cli-quick-response ()
   "Send a quick response to Gemini."
